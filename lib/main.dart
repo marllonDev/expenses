@@ -1,16 +1,27 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'models/transaction.dart';
-import 'package:intl/intl.dart';
+import '../components/transaction_form.dart';
+import '../components/transaction_list.dart';
+import '../models/transaction.dart';
+
 main() => runApp(ExpensesApp());
 
 class ExpensesApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: MyHomePage());
+    return MaterialApp(
+      home: MyHomePage(),
+    );
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  //abaixo contém uma list feita usando o construtor Transaction.
   final _transactions = [
     //aqui tem uma lista de transações
     Transaction(
@@ -28,79 +39,72 @@ class MyHomePage extends StatelessWidget {
     ),
   ];
 
+  _addTransaction(String title, double value) {
+    final newTransaction = Transaction(
+      id: Random()
+          .nextDouble()
+          .toString(), //aqui irá gerar um id único para cada transação.
+      title:
+          title, //aqui o primeiro title está se referindo ao title do atributo de Transaction e o segundo ao parâmetro da função.
+      value: value,
+      date: DateTime.now(),
+    );
+
+    setState(() {
+      _transactions.add(newTransaction);
+    });
+  }
+
+  _openTransactionFormModal(BuildContext context) {//aqui foi feita uma função para ao clicar no botão de 'add' abrir o formulário.
+    showModalBottomSheet(
+        context: context,
+        builder: (_) {//o builder aqui vai receber o construtor TransactionForm, para ser construído quando for clicado.
+          return TransactionForm(_addTransaction);
+        }
+    );
+    //então aqui ficou assim: a função _openTransactionFormModal irá ser chamada ao clicar do botão 'add' que irá abrir o TransactionForm e irá usar o _addTransaction como parâmetro, fazendo assim adicionar mais um evento ao formulário.
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       //componentes dento do Scaffold(esqueleto da página).
-      appBar: AppBar(title: Text('Despesas Pessoais')), //topo do app
-      body: Column(
-        //obs: na column(coluna) os widgets são posicionados de forma vertical e na Row(linha) na forma horizontal.
-        mainAxisAlignment: MainAxisAlignment
-            .spaceAround, //posiciona na linha vertical. spaceAround = espaço em volta.
-        crossAxisAlignment: CrossAxisAlignment
-            .stretch, //posiciona na linha(horizontal). stretch = esticar.
-        children: <Widget>[
-          Container(
-            child: Card(
-              color: Colors.blue,
-              child: Text('Gráfico'),
-              elevation: 5,
-            ),
-          ),
-          Column(
-            children: _transactions.map((tr) {
-              return Card(
-                //dentro deste Card teremos Column, Row e Container para agrupar as informações na vertical, horizontal e em bloco respectivamente.
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      //Container que mostra o valor no lado direito da tela.
-                      margin: EdgeInsets.symmetric(//symmetric foi posto para ser diferente os valores dos eixos verticais e horizontais.
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.purple,
-                          width: 2,
-                        ),
-                      ),
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        'R\$ ${tr.value.toStringAsFixed(2)}',//mostra o valor
-                        style: TextStyle(//mudando o estilo do texto
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.purple,
-                        ),
-                        ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,//para posiciona os textos no início.
-                      //Column que mostra o Title e o Date, um em baixo do outro.
-                      children: <Widget>[
-                        Text(
-                          tr.title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold, 
-                          ),
-                        ),
-                        Text(
-                          DateFormat('d MMMM y').format(tr.date),//isso pôde ser usado por causa da dependência 'intl'.
-                          style: TextStyle(
-                            color: Colors.grey,
-                          ),
-                          ),
-                      ],
-                    )
-                  ],
-                ),
-              );
-            }).toList(),
+      appBar: AppBar(
+        //topo do app
+        title: Text('Despesas Pessoais'),
+        actions: <Widget>[
+          IconButton(
+            //add button
+            onPressed: () => _openTransactionFormModal(context),
+            icon: Icon(Icons.add),
           ),
         ],
       ),
+      body: SingleChildScrollView(
+        //aqui foi add o scroll para possibilitar a rolagem.
+        child: Column(
+          //obs: na column(coluna) os widgets são posicionados de forma vertical e na Row(linha) na forma horizontal.
+          crossAxisAlignment: CrossAxisAlignment
+              .stretch, //posiciona na linha(horizontal). stretch = esticar.
+          children: <Widget>[
+            Container(
+              child: Card(
+                color: Colors.blue,
+                child: Text('Gráfico'),
+                elevation: 5,
+              ),
+            ),
+            TransactionList(_transactions),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        //botão da parte de baixo.
+        child: Icon(Icons.add),
+        onPressed: () => _openTransactionFormModal(context),
+      ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.centerFloat, //localização do botão.
     );
   }
 }
