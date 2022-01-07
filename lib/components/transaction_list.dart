@@ -11,7 +11,23 @@ class TransactionList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 300,
-      child: ListView.builder(//aqui é criado cada objeto da lista quando necessário para não pesar o cell.
+      child: transactions.isEmpty ? Column(
+        children: <Widget> [
+          SizedBox(height:20),//espaçamento
+          Text(
+            'Nenhuma Transação Cadastrada!',
+            style: Theme.of(context).appBarTheme.toolbarTextStyle,
+          ),
+          SizedBox(height:20),//espaçamento
+          Container(
+            height: 200,
+            child: Image.asset(
+              'assets/images/waiting.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+        ],
+      ) : ListView.builder(//aqui é criado cada objeto da lista quando necessário para não pesar o cell.
         itemCount: transactions.length,
         itemBuilder: (ctx, index) {
           final tr = transactions[index];
@@ -50,10 +66,7 @@ class TransactionList extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       tr.title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).appBarTheme.toolbarTextStyle,//pegando o style do main
                     ),
                     Text(
                       DateFormat('d MMMM y').format(tr

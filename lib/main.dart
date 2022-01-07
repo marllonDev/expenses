@@ -11,19 +11,42 @@ class ExpensesApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: MyHomePage(),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.purple,
+        ).copyWith(
+          secondary: Colors.amber,
+        ), //aqui foi posto um esquema de cores, uma cor principal e uma secundária que muda as cores de forma geral e o botão floatingActionButton respectivamente.
+        fontFamily: 'Quicksand', //font geral
+        appBarTheme: AppBarTheme(
+          //style somente do title Principal
+          titleTextStyle: TextStyle().copyWith(
+            fontFamily: 'OpenSans',
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+          toolbarTextStyle: TextStyle().copyWith(
+            //style para os demais title's
+            fontFamily: 'OpenSans',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   //abaixo contém uma list feita usando o construtor Transaction.
-  final _transactions = [
+  final List<Transaction> _transactions = [
     //aqui tem uma lista de transações
+    /*
     Transaction(
       //aqui foi chamado o construtor e foi definido valores em seus atributos.
       id: 't1',
@@ -37,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
       value: 211.30,
       date: DateTime.now(), //tempo de exatamente agora.
     ),
+    */
   ];
 
   _addTransaction(String title, double value) {
@@ -53,15 +77,17 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _transactions.add(newTransaction);
     });
+    Navigator.of(context).pop(); //fecha o modal.
   }
 
-  _openTransactionFormModal(BuildContext context) {//aqui foi feita uma função para ao clicar no botão de 'add' abrir o formulário.
+  _openTransactionFormModal(BuildContext context) {
+    //aqui foi feita uma função para ao clicar no botão de 'add' abrir o formulário.
     showModalBottomSheet(
         context: context,
-        builder: (_) {//o builder aqui vai receber o construtor TransactionForm, para ser construído quando for clicado.
+        builder: (_) {
+          //o builder aqui vai receber o construtor TransactionForm, para ser construído quando for clicado.
           return TransactionForm(_addTransaction);
-        }
-    );
+        });
     //então aqui ficou assim: a função _openTransactionFormModal irá ser chamada ao clicar do botão 'add' que irá abrir o TransactionForm e irá usar o _addTransaction como parâmetro, fazendo assim adicionar mais um evento ao formulário.
   }
 
@@ -71,7 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
       //componentes dento do Scaffold(esqueleto da página).
       appBar: AppBar(
         //topo do app
-        title: Text('Despesas Pessoais'),
+        title: Text(
+          'Despesas Pessoais',
+          style: TextStyle(
+            fontFamily: 'OpenSans',
+          ),
+        ),
         actions: <Widget>[
           IconButton(
             //add button
