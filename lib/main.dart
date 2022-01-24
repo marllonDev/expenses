@@ -1,8 +1,10 @@
 import 'dart:math';
+import 'package:expenses/components/chart.dart';
 import 'package:flutter/material.dart';
 import '../components/transaction_form.dart';
 import '../components/transaction_list.dart';
 import '../models/transaction.dart';
+import 'components/chart.dart';
 
 main() => runApp(ExpensesApp());
 
@@ -63,6 +65,12 @@ class _MyHomePageState extends State<MyHomePage> {
     */
   ];
 
+  List<Transaction> get _recentTransactions {
+    return _transactions.where((tr) {
+      return tr.date.isAfter(DateTime.now().subtract(Duration(days: 7)));
+    }).toList();
+  }
+
   _addTransaction(String title, double value) {
     final newTransaction = Transaction(
       id: Random()
@@ -118,13 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment
               .stretch, //posiciona na linha(horizontal). stretch = esticar.
           children: <Widget>[
-            Container(
-              child: Card(
-                color: Colors.blue,
-                child: Text('Gráfico'),
-                elevation: 5,
-              ),
-            ),
+            Chart(_recentTransactions),
             TransactionList(_transactions),
           ],
         ),
